@@ -53,6 +53,8 @@ resource_types = {
             stringArgument("NOW_PLAYING_ART", ""),
             enumArgument("STATE", {"Play", "Pause", "Stop", "None"}, "Stop"),
             stringArgument("CONTENT_ID", ""),
+            numericArgument("PLAYQUEUE_INDEX", -1, -1, 999999),
+            stringArgument("PLAYQUEUE_VERSION", "0"),
             boolArgument("_SHUFFLE", false),
             stringArgument("_REPEAT", "")
         }
@@ -95,17 +97,11 @@ function query(queryName, resource, queryArgs)
     elseif queryName == "GET_PLAYQUEUE" or queryName == "LIST_PLAYQUEUE_ITEMS" or queryName == "BROWSE_PLAYQUEUE" then
         Trace(">>> SERVING CACHE: " .. tostring(#CACHED_PLAYQUEUE) .. " items. ACTIVE IDX: " .. tostring(CACHED_PLAYQUEUE_INDEX))
         
-        -- The Omni-Payload: Satisfies both Native and Legacy parsers simultaneously
-        return { 
-            -- Native Keys
-            version = 1,
+        return {
+            version = "1",
             total = #CACHED_PLAYQUEUE,
             offset = 0,
-            items = CACHED_PLAYQUEUE,
-            
-            -- Legacy Keys
-            playqueue_items = CACHED_PLAYQUEUE, 
-            playqueue_index = CACHED_PLAYQUEUE_INDEX
+            items = CACHED_PLAYQUEUE
         }
     end
 end
@@ -223,11 +219,9 @@ function process()
                         table.insert(new_queue, {
                             id = track.ussi or tostring(i),
                             name = t_name,
-                            title = t_name,
                             artist = safe_artist,
                             album = t_album,
                             art = t_art,
-                            image_url = t_art,
                             type = "track",
                             providerType = "uri"
                         })
@@ -252,6 +246,8 @@ function process()
                 NOW_PLAYING_DETAILS = now_playing_details,
                 NOW_PLAYING_ART = now_playing_art,
                 CONTENT_ID = content_id,
+                PLAYQUEUE_INDEX = CACHED_PLAYQUEUE_INDEX,
+                PLAYQUEUE_VERSION = tostring(#CACHED_PLAYQUEUE) .. ":" .. tostring(content_id),
                 _SHUFFLE = is_shuffle,
                 _REPEAT = repeat_str
             })

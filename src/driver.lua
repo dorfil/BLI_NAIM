@@ -41,7 +41,7 @@ resource_types = {
             PREV = { context_help = "Previous track" },
             _SET_SHUFFLE = { arguments = { boolArgument("_SHUFFLE", false) }, context_help = "Set Shuffle" },
             _SET_REPEAT = { arguments = { stringArgument("_REPEAT", "") }, context_help = "Set Repeat" },
-            SET_CONTENT_ID = { arguments = { stringArgument("PROVIDER_TYPE", ""), stringArgument("ID", "") }, context_help = "Inject URI" }
+            SET_CONTENT_ID = { arguments = { stringArgument("ID", ""), stringArgument("PROVIDER_TYPE", "dlna") }, context_help = "Play a DLNA stream URL" }
         },
         states = {
             boolArgument("ONLINE", false),
@@ -72,7 +72,7 @@ local CACHED_PLAYQUEUE = {}
 local CACHED_PLAYQUEUE_INDEX = 0
 
 local CACHED_INPUTS = {
-    { address = "playqueue", name = "Playqueue / UPnP", type = "internal", capabilities = {"PLAYER", "PLAYQUEUE", "CONTENT"} },
+    { address = "playqueue", name = "Playqueue / UPnP", type = "internal", capabilities = {"PLAYER", "PLAYQUEUE", "CONTENT"}, providerTypes = {"dlna"} },
     { address = "analog1", name = "Analog 1", type = "internal", capabilities = {"PLAYER"} },
     { address = "spotify", name = "Spotify", type = "internal", capabilities = {"PLAYER", "PLAYQUEUE", "CONTENT"} },
     { address = "tidal", name = "Tidal", type = "internal", capabilities = {"PLAYER", "PLAYQUEUE", "CONTENT"} }
@@ -127,7 +127,7 @@ function process()
                 if type(parsed) == "table" and type(parsed.children) == "table" then
                     local new_inputs = {}
                     
-                    table.insert(new_inputs, { address = "playqueue", name = "Playqueue / UPnP", type = "internal", capabilities = {"PLAYER", "PLAYQUEUE", "CONTENT"} })
+                    table.insert(new_inputs, { address = "playqueue", name = "Playqueue / UPnP", type = "internal", capabilities = {"PLAYER", "PLAYQUEUE", "CONTENT"}, providerTypes = {"dlna"} })
                     
                     for _, inp in ipairs(parsed.children) do
                         local raw_address = inp.name or "unknown"
